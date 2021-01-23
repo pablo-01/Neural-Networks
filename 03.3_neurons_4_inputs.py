@@ -70,3 +70,4 @@ output = ([
 
 print("3 neurons with 4 inputs")
 print(output, "\n")
+
