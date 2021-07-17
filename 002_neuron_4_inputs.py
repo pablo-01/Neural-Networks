@@ -3,7 +3,6 @@
 ###
 
 
-
 # inputs from 4 neurons
 inputs = [1.0, 2.0, 3.0, 2.5]
 
