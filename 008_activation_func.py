@@ -5,11 +5,6 @@ from nnfs.datasets import spiral_data
 
 nnfs.init()
 
-# sample exercise data
-# 100 feature sets of 3 classes
-X, y = spiral_data(100, 3)
-
-
 # Dense layer
 class Layer_Dense:
     def __init__(self, n_inputs, n_neurons):
@@ -21,24 +16,43 @@ class Layer_Dense:
         self.output = np.dot(inputs, self.weights) + self.biases
 
 
-# Activation function
+# Activation function relu
 class Activation_ReLU:
     def forward(self, inputs):
         self.output = np.maximum(0, inputs)
 
+# Softmax activation function
+class Activation_Softmax:
+    def forward(self, inputs):
+        exp_values = np.exp(inputs - np.max(inputs, axis=1, keepdims=True))
+        probabilities = exp_values / np.sum(exp_values, axis=1, keepdims=True)
+        self.output = probabilities
 
-# size of iputs (number of features in each sample);
-# number of neurons (any number)
-layer1 = Layer_Dense(2, 5)
+# data
+X, y = spiral_data(samples=100, classes=3)
+
+# (inputs, outputs)
+dense1 = Layer_Dense(2, 3)
 activation1 = Activation_ReLU()
 
-# size of inputs is the same as the number
-# of neurons in the previous layer
+# (inputs, outputs): output from the previous layer is the input for the next layer
+dense2 = Layer_Dense(3, 3)
+activation2 = Activation_Softmax()
 
-layer1.forward(X)
-#print(layer1.output)
-activation1.forward(layer1.output)
-print(activation1.output)
+# begin passing data
+dense1.forward(X)
+# activate
+activation1.forward(dense1.output)
+
+
+# pass data through the next layer
+dense2.forward(activation1.output)
+activation2.forward(dense2.output)
+
+# probs
+# print first 5
+print(activation2.output[:5])
+
 
 
 
