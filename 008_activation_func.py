@@ -28,6 +28,41 @@ class Activation_Softmax:
         probabilities = exp_values / np.sum(exp_values, axis=1, keepdims=True)
         self.output = probabilities
 
+
+# common loss
+class Loss:
+    def calculate(self, output, y):
+        sample_losses = self.forward(output, y)
+        data_loss = np.mean(sample_losses)
+        return data_loss
+
+# categorical cross entropy loss
+# inherit from Loss class
+class Loss_CategoricalCrossEntropy(Loss):
+    # y_pred is the output of the network
+    # y_true is the true label
+    def forward(self, y_pred, y_true):
+        samples = len(y_pred)
+        # clip the values to avoid log(0) - infinity
+        y_pred_clipped = np.clip(y_pred, 1e-7, 1-1e-7)
+
+        # check for one-hot encoding or not
+        # scalar class values
+        if len(y_true.shape) == 1:
+            correct_confidences = y_pred_clipped[range(samples), y_true]
+        # one-hot encoded vectors (2d array)
+        # in one-hot encoding everything is 0 exept the target
+        elif len(y_true.shape) == 2:
+            correct_confidences = np.sum(y_pred_clipped*y_true, axis=1)
+
+        # negative log likelihood
+        negative_log_likelihood = -np.log(correct_confidences)
+        # returns vector of values 
+        return negative_log_likelihood 
+
+
+
+
 # data
 X, y = spiral_data(samples=100, classes=3)
 
@@ -52,6 +87,14 @@ activation2.forward(dense2.output)
 # probs
 # print first 5
 print(activation2.output[:5])
+
+# define loss fuction
+loos_function = Loss_CategoricalCrossEntropy()
+
+# calculate loss
+loss = loos_function.calculate(activation2.output, y)
+
+print("Loss: ", loss)
 
 
 
